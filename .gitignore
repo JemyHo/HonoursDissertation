@@ -1,0 +1,5 @@
+
+# --- secrets ---
+kaggle.json
+**/kaggle.json
+**/.kaggle/

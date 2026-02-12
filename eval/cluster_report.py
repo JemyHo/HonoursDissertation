@@ -62,29 +62,38 @@ def plot_heatmap_clusters_vs_true(M, class_names=None, title="Clusters × True C
     plt.tight_layout()
     plt.show()
 
-def plot_2d(Z, y_pred, title="2D view coloured by cluster", max_points=5000, seed=0):
-    Z = np.asarray(Z)
+def plot_2d(X, y_pred, method="pca", title="2D plot", sample=3000, random_state=0):
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    X = np.asarray(X)
     y_pred = np.asarray(y_pred)
 
-    # downsample for plotting speed/readability
-    n = Z.shape[0]
-    if n > max_points:
-        rng = np.random.default_rng(seed)
-        idx = rng.choice(n, size=max_points, replace=False)
-        Zp = Z[idx]
-        yp = y_pred[idx]
+    n = X.shape[0]
+    if sample is not None and n > sample:
+        rng = np.random.default_rng(random_state)
+        idx = rng.choice(n, size=sample, replace=False)
+        Xs = X[idx]
+        ys = y_pred[idx]
     else:
-        Zp, yp = Z, y_pred
+        Xs = X
+        ys = y_pred
 
-    # PCA to 2D
-    Zp = Zp - Zp.mean(axis=0, keepdims=True)
-    U, S, Vt = np.linalg.svd(Zp, full_matrices=False)
-    XY = U[:, :2] * S[:2]
+    method = method.lower().strip()
 
-    plt.figure(figsize=(8, 6))
-    plt.scatter(XY[:, 0], XY[:, 1], c=yp, s=6, alpha=0.7)
-    plt.title(title + " (PCA)")
-    plt.xlabel("PC1")
-    plt.ylabel("PC2")
-    plt.tight_layout()
-    plt.show()
+    if method == "pca":
+        from sklearn.decomposition import PCA
+        Z = PCA(n_components=2, random_state=random_state).fit_transform(Xs)
+
+    elif method in ("tsne", "t-sne"):
+        from sklearn.manifold import TSNE
+        Z = TSNE(n_components=2, init="pca", learning_rate="auto", random_state=random_state).fit_transform(Xs)
+
+    else:
+        raise ValueError(f"Unknown method: {method}. Use 'pca' or 'tsne'.")
+
+    plt.figure(figsize=(7, 6))
+    plt.scatter(Z[:, 0], Z[:, 1], c=ys, s=6)
+    plt.title(title)
+    plt.xlabel("dim-1")
+    plt.ylabel("dim-2")

@@ -12,7 +12,6 @@ from data.load_mfeat import load_mfeat
 from data.load_reuters21578 import load_reuters21578_kmeans
 from data.load_awa2 import load_awa2
 
-
 def parse_seeds(s: str):
     return [int(x.strip()) for x in s.split(",") if x.strip()]
 
@@ -78,6 +77,10 @@ def main():
         )
         K = int(np.max(y_true) + 1) if args.K is None else args.K
         ds_tag = f"awa2_{args.awa2_split}_K{K}_m{args.max_per_class}"
+    
+    for i, X in enumerate(views):
+        print(f"view{i} shape={X.shape} nan={np.isnan(X).sum()} inf={np.isinf(X).sum()} min={np.nanmin(X)} max={np.nanmax(X)}")
+
 
     # -------- output dir --------
     out_dir = os.path.join(args.out, f"dcmvc_{ds_tag}")

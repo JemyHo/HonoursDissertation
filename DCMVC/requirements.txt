@@ -1,0 +1,7 @@
+# Minimal deps for this repo in Colab/local
+numpy
+scipy
+scikit-learn
+hdf5storage
+torch
+matplotlib

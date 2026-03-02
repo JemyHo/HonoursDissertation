@@ -1,213 +1,155 @@
-from __future__ import annotations
-
-from typing import List, Optional, Dict
+from network import Network
+from metric import valid
+from model import *
 import numpy as np
-import torch
-from torch.utils.data import DataLoader
-from sklearn.cluster import KMeans
+import argparse
+import random
+import os
+from loss import *
 
-from .config import Config
-from .utils import set_seed, standardize_views
-from .data import MultiViewDataset
-from .model import DCMVC
-from .losses import (
-    recon_loss_mse,
-    compute_global_centroids,
-    dcd_loss,
-    rngpa_loss,
-    build_knn_lists_full,
-)
-from .metrics import clustering_acc, nmi, ari
-
-
-@torch.no_grad()
-def encode_all(model: DCMVC, loader: DataLoader, device: torch.device):
-    """Encode the full dataset to get consensus and per-view embeddings."""
-    model.eval()
-
-    z_chunks = []
-    z_v_chunks = None
-    idxs = []
-
-    for x_views, idx, _ in loader:
-        x_views = [x.to(device) for x in x_views]
-        z_views, _, z_cons, _ = model(x_views)
-
-        z_chunks.append(z_cons.detach().cpu())
-        if z_v_chunks is None:
-            z_v_chunks = [[] for _ in range(len(z_views))]
-        for v in range(len(z_views)):
-            z_v_chunks[v].append(z_views[v].detach().cpu())
-
-        idxs.append(idx.numpy())
-
-    z_all = torch.cat(z_chunks, dim=0)
-    z_views_all = [torch.cat(ch, dim=0) for ch in z_v_chunks]
-    idx_all = np.concatenate(idxs, axis=0)
-    return z_all, z_views_all, idx_all
+Dataname = 'RGB-D'
+parser = argparse.ArgumentParser(description='train')
+parser.add_argument('--dataset', default=Dataname, help='[CCV, RGB-D, Cora, ALOI-100, Hdigit, Digit-Product, MFeat, Reuters, AwA2]')
+parser.add_argument('--save_model', default=True, help='Saving the model after training.')
+parser.add_argument('--batch_size', default=256, type=int)
+parser.add_argument("--temperature_f", default=0.5)
+parser.add_argument("--temperature_l", default=0.5)
+parser.add_argument("--learning_rate", default=0.0001)
+parser.add_argument("--weight_decay", default=0.)
+parser.add_argument("--mse_epochs", default=200)
+parser.add_argument("--con_epochs", default=100)
+parser.add_argument("--feature_dim", default=256)
+parser.add_argument("--large_datasets", default=False, type=str)
+parser.add_argument("--k", default=5)
+parser.add_argument("--alpha", default=None, type=float, help="Override alpha if set")
+parser.add_argument("--beta", default=None, type=float, help="Override beta if set")
+parser.add_argument('--gpu', default='0', type=str, help='GPU device idx.')
+args = parser.parse_args()
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def train_dcmvc(
-    views: List[np.ndarray],
-    n_clusters: int,
-    labels: Optional[np.ndarray] = None,
-    cfg: Config = Config(),
-) -> Dict[str, object]:
-    """Train DCMVC in two stages:
+args = parser.parse_args()
+os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-    1) Warm-up: reconstruction only
-    2) Fine-tune: EM loop
-        - E-step: KMeans on consensus embedding -> pseudo labels
-        - M-step: minimize L = Lrec + alpha*Ldcd + beta*Lrngpa
-    """
 
-    set_seed(cfg.seed)
-    device = torch.device(cfg.device)
+def set_seed(seed):
+    np.random.seed(seed)
+    random.seed(seed)
 
-    views = standardize_views(views)
-    N = views[0].shape[0]
-    in_dims = [v.shape[1] for v in views]
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
 
-    ds = MultiViewDataset(views, labels=labels)
+    torch.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
-    loader = DataLoader(
-        ds,
-        batch_size=cfg.batch_size,
-        shuffle=True,
-        num_workers=cfg.num_workers,
-        drop_last=True,
-    )
 
-    full_loader = DataLoader(
-        ds,
-        batch_size=cfg.batch_size,
-        shuffle=False,
-        num_workers=cfg.num_workers,
-        drop_last=False,
-    )
+if __name__ == "__main__":
 
-    model = DCMVC(in_dims=in_dims, latent_dim=cfg.latent_dim).to(device)
-    opt = torch.optim.Adam(model.parameters(), lr=cfg.lr)
+    if args.dataset == "CCV":
+        args.seed = 10
+        args.k = 10
+        alpha = 0.0001
+        beta = 0.001
 
-    # RNGPA neighbor graph strategy
-    use_full_graph = (N <= 10_000)
-    k = cfg.k_small if use_full_graph else cfg.k_large
+    elif args.dataset == "Digit-Product":
+        args.large_datasets = True
+        args.seed = 10
+        args.k = 4
+        alpha = 0.01
+        beta = 0.1
 
-    full_knn_lists = None
-    if use_full_graph:
-        full_knn_lists = []
-        for v in range(len(views)):
-            full_knn_lists.append(build_knn_lists_full(views[v], k=k))
+    elif args.dataset == "RGB-D":
+        args.seed = 5
+        args.k = 10
+        alpha = 0.01
+        beta = 1
 
-    # ----------------------
-    # Warm-up
-    # ----------------------
-    model.train()
-    for ep in range(cfg.warmup_epochs):
-        total_loss = 0.0
-        for x_views, _, _ in loader:
-            x_views = [x.to(device) for x in x_views]
-            z_views, xh_views, z_cons, w = model(x_views)
+    elif args.dataset == 'Cora':
+        args.seed = 10
+        args.con_epochs = 100
+        args.k = 10
+        alpha = 0.01
+        beta = 0.1
 
-            loss = recon_loss_mse(x_views, xh_views)
+    elif args.dataset == 'ALOI-100':
+        args.large_datasets = True
+        args.batch_size = 256
+        args.seed = 5
+        args.con_epochs = 100
+        args.k = 5
+        alpha = 0.1
+        beta = 0.001
 
-            opt.zero_grad(set_to_none=True)
-            loss.backward()
-            opt.step()
+    elif args.dataset == 'Hdigit':
+        args.large_datasets = True
+        args.seed = 10
+        args.k = 5
+        alpha = 1
+        beta = 0.1
 
-            total_loss += float(loss.detach().cpu())
+    elif args.dataset == 'MFeat':
+        args.seed = 0
+        args.k = 10
+        alpha = 0.01
+        beta = 0.1
 
-        if (ep + 1) % 20 == 0:
-            print(
-                f"[Warm-up] epoch {ep+1:03d}/{cfg.warmup_epochs} "
-                f"Lrec={total_loss/len(loader):.6f} "
-                f"w={w.detach().cpu().numpy()}"
-            )
+    elif args.dataset == 'Reuters':
+        args.seed = 0
+        args.k = 10
+        alpha = 0.01
+        beta = 0.1
 
-    # ----------------------
-    # Fine-tune (EM)
-    # ----------------------
-    assign_all = None
-    mu_global = None
-    mu_v_global = None
+    elif args.dataset == 'AwA2':
+        args.large_datasets = True
+        args.seed = 0
+        args.k = 3
+        alpha = 0.1
+        beta = 0.1
 
-    for ep in range(cfg.finetune_epochs):
-        # E-step: KMeans on full consensus embeddings
-        z_all_cpu, z_views_all_cpu, idx_all = encode_all(model, full_loader, device)
-        z_all = z_all_cpu.to(device)
-        z_views_all = [zv.to(device) for zv in z_views_all_cpu]
+    print("==================================\nArgs:{}\n==================================".format(args))
+    set_seed(args.seed)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    mv_data = MultiviewData(args.dataset, device)
+    num_views = len(mv_data.data_views)
+    num_samples = mv_data.labels.size
+    num_clusters = np.unique(mv_data.labels).size
+    input_sizes = np.zeros(num_views, dtype=int)
+    for idx in range(num_views):
+        input_sizes[idx] = mv_data.data_views[idx].shape[1]
 
-        km = KMeans(n_clusters=n_clusters, n_init=20, max_iter=300, random_state=cfg.seed)
-        km.fit(z_all_cpu.numpy())
-        assign_all = km.labels_
+    network = Network(num_views, num_samples, num_clusters, input_sizes, args.feature_dim)
+    network = network.to(device)
+    optimizer = torch.optim.Adam(network.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
+    mvc_loss = Loss(args.batch_size, num_clusters, args.temperature_l, args.temperature_f).to(device)
 
-        # epoch-level centroids (fallback when batch misses clusters)
-        mu_global, mu_v_global = compute_global_centroids(z_all, z_views_all, assign_all, n_clusters)
+    epoch_list = []
+    totalloss_list = []
+    # allow overriding alpha/beta from CLI
+    if args.alpha is not None:
+        alpha = args.alpha
+    if args.beta is not None:
+        beta = args.beta
 
-        # M-step
-        model.train()
-        totals = {"rec": 0.0, "dcd": 0.0, "rng": 0.0, "all": 0.0}
+    pre_train_loss_values = pre_train(network, mv_data, args.batch_size, args.mse_epochs, optimizer)
 
-        for x_views, idx, _ in loader:
-            x_views = [x.to(device) for x in x_views]
-            idx_np = idx.numpy()
-            assign_batch = torch.from_numpy(assign_all[idx_np].astype(np.int64)).to(device)
+    if args.large_datasets == False:
+        W = get_W(mv_data, k=args.k)
+        for epoch in range(1, args.con_epochs + 1):
+            total_loss = contrastive_train(network, mv_data, mvc_loss, args.batch_size, epoch, W, alpha, beta, optimizer)
+            epoch_list.append(epoch)
+            totalloss_list.append(total_loss)
+        valid(network, mv_data, num_samples)
 
-            z_views, xh_views, z_cons, w = model(x_views)
+    else:
+        for epoch in range(1, args.con_epochs + 1):
+            total_loss = contrastive_largedatasetstrain(network, mv_data, mvc_loss, args.batch_size, epoch, args.k,
+                                                        alpha, beta, optimizer)
+            epoch_list.append(epoch)
+            totalloss_list.append(total_loss)
+        valid(network, mv_data, num_samples)
 
-            l_rec = recon_loss_mse(x_views, xh_views)
-            l_dcd = dcd_loss(
-                z_cons=z_cons,
-                z_views=z_views,
-                assign_batch=assign_batch,
-                K=n_clusters,
-                tauC=cfg.tauC,
-                mu_global=mu_global,
-                mu_v_global=mu_v_global,
-            )
-            l_rng = rngpa_loss(
-                z_cons=z_cons,
-                z_views=z_views,
-                x_views=x_views,
-                assign_batch=assign_batch,
-                tauI=cfg.tauI,
-                k=k,
-                full_knn_lists=full_knn_lists,
-                batch_indices=idx_np if use_full_graph else None,
-            )
-
-            loss = l_rec + cfg.alpha * l_dcd + cfg.beta * l_rng
-
-            opt.zero_grad(set_to_none=True)
-            loss.backward()
-            opt.step()
-
-            totals["rec"] += float(l_rec.detach().cpu())
-            totals["dcd"] += float(l_dcd.detach().cpu())
-            totals["rng"] += float(l_rng.detach().cpu())
-            totals["all"] += float(loss.detach().cpu())
-
-        if (ep + 1) % 10 == 0:
-            print(
-                f"[Fine-tune] epoch {ep+1:03d}/{cfg.finetune_epochs} "
-                f"L={totals['all']/len(loader):.6f} "
-                f"Lrec={totals['rec']/len(loader):.6f} "
-                f"Ldcd={totals['dcd']/len(loader):.6f} "
-                f"Lrng={totals['rng']/len(loader):.6f} "
-                f"w={w.detach().cpu().numpy()}"
-            )
-
-    # final encode + KMeans
-    z_all_cpu, _, _ = encode_all(model, full_loader, device)
-    km_final = KMeans(n_clusters=n_clusters, n_init=50, max_iter=500, random_state=cfg.seed)
-    pred = km_final.fit_predict(z_all_cpu.numpy())
-
-    results: Dict[str, object] = {"model": model, "z": z_all_cpu.numpy(), "pred": pred}
-
-    if labels is not None:
-        results["acc"] = clustering_acc(labels, pred)
-        results["nmi"] = nmi(labels, pred)
-        results["ari"] = ari(labels, pred)
-        print(f"[Final] ACC={results['acc']:.4f} NMI={results['nmi']:.4f} ARI={results['ari']:.4f}")
-
-    return results
+    if args.save_model:
+        state = network.state_dict()
+        torch.save(state, './models/%s.pth' % args.dataset)

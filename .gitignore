@@ -3,3 +3,19 @@
 kaggle.json
 **/kaggle.json
 **/.kaggle/
+
+# Generated datasets (do not commit)
+DCMVC/datasets/*.mat
+DCMVC/datasets/*.npy
+DCMVC/datasets/*.npz
+
+# Outputs/checkpoints
+DCMVC/models/*.pt
+DCMVC/models/*.pth
+eval/outputs/
+runs/
+
+# Python cache
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

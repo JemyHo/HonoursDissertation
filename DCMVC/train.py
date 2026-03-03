@@ -24,6 +24,7 @@ parser.add_argument("--k", default=5)
 parser.add_argument("--alpha", default=None, type=float, help="Override alpha if set")
 parser.add_argument("--beta", default=None, type=float, help="Override beta if set")
 parser.add_argument('--gpu', default='0', type=str, help='GPU device idx.')
+parser.add_argument("--seed", type=int, default=0)
 args = parser.parse_args()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

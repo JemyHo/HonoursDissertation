@@ -149,7 +149,3 @@ if __name__ == "__main__":
             epoch_list.append(epoch)
             totalloss_list.append(total_loss)
         valid(network, mv_data, num_samples)
-
-    if args.save_model:
-        state = network.state_dict()
-        torch.save(state, './models/%s.pth' % args.dataset)

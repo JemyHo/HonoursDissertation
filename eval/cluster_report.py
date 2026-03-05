@@ -43,24 +43,59 @@ def cluster_composition_table(y_true, y_pred, class_names=None, topk=5):
     df = pd.DataFrame(rows).sort_values(["size", "purity"], ascending=False).reset_index(drop=True)
     return df, M
 
-def plot_heatmap_clusters_vs_true(M, class_names=None, title="Clusters × True Classes", max_ticks=25):
-    K, C = M.shape
-    plt.figure(figsize=(10, 7))
-    plt.imshow(M, aspect="auto")
-    plt.colorbar(label="count")
+def cluster_class_count_matrix(y_true, y_pred, n_clusters=None, n_classes=None):
+  y_true = np.asarray(y_true, dtype=int)
+  y_pred = np.asarray(y_pred, dtype=int)
+  K = int(n_clusters if n_clusters is not None else (y_pred.max() + 1))
+  C = int(n_classes  if n_classes  is not None else (y_true.max() + 1))
+  cm = np.zeros((K, C), dtype=int)
+  for p, t in zip(y_pred, y_true):
+      if 0 <= p < K and 0 <= t < C:
+          cm[p, t] += 1
+  return cm
+
+def plot_heatmap(cm, title, xlabels=None, ylabels=None, max_xticks=20,
+                 figsize=(7,5), vmin=0, vmax=None):
+    plt.figure(figsize=figsize)
+    plt.imshow(cm, aspect="auto", vmin=vmin, vmax=vmax)
+    plt.title(title)
     plt.xlabel("True class")
     plt.ylabel("Cluster")
-    plt.title(title)
 
-    # ticks (don’t spam 50 labels unless you want chaos)
-    if class_names is not None and C <= max_ticks:
-        plt.xticks(range(C), class_names, rotation=90, fontsize=8)
-    elif class_names is not None:
-        step = max(1, C // 10)
-        xs = list(range(0, C, step))
-        plt.xticks(xs, [class_names[i] for i in xs], rotation=90, fontsize=8)
+    if xlabels is not None:
+        if len(xlabels) <= max_xticks:
+            plt.xticks(range(len(xlabels)), xlabels, rotation=90, fontsize=8)
+        else:
+            step = max(1, len(xlabels)//max_xticks)
+            idx = list(range(0, len(xlabels), step))
+            plt.xticks(idx, [xlabels[i] for i in idx], rotation=90, fontsize=8)
+
+    if ylabels is not None:
+        if len(ylabels) <= max_xticks:
+            plt.yticks(range(len(ylabels)), ylabels, fontsize=8)
+
+    plt.colorbar(label="count")
     plt.tight_layout()
     plt.show()
+
+
+def hungarian_reorder(cm):
+    """
+    cm: [K, C] counts for (cluster, class)
+    Returns:
+      row_order: clusters reordered so best-matched classes go left-to-right
+      col_order: classes reordered to match the same ordering (optional)
+      mapping: dict cluster -> matched class
+    """
+    # Hungarian: maximize sum of matched counts => minimize (-cm)
+    r, c = linear_sum_assignment(-cm)
+    mapping = {int(rr): int(cc) for rr, cc in zip(r, c)}
+
+    # Sort pairs by matched class index to create a diagonal view
+    pairs = sorted(zip(r, c), key=lambda x: x[1])
+    row_order = [int(rr) for rr, _ in pairs]
+    col_order = [int(cc) for _, cc in pairs]
+    return row_order, col_order, mapping
 
 def plot_2d(X, y_pred, method="pca", title="2D plot", sample=3000, random_state=0):
     import numpy as np

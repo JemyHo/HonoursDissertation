@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.optimize import linear_sum_assignment
 
 def cluster_composition_table(y_true, y_pred, class_names=None, topk=5):
     y_true = np.asarray(y_true)

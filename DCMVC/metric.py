@@ -53,7 +53,7 @@ def inference(loader, model, data_size):
     labels_vector = np.array(labels_vector).reshape(data_size)
     return labels_vector, commonZ
 
-def valid(model, dataset, data_size):
+def valid(model, dataset, data_size, dataset_name=None, seed=None, save_dir="preds"):
 
     test_loader = torch.utils.data.DataLoader(
         dataset,
@@ -65,5 +65,12 @@ def valid(model, dataset, data_size):
     print('Clustering results:')
     y_pred = model.clustering(commonZ)
     y_pred = y_pred.cpu().numpy()
+
+    # ---- SAVE y_pred for diagnostics (seed 0 plots, etc.) ----
+    if dataset_name is not None and seed is not None:
+        import os
+        os.makedirs(save_dir, exist_ok=True)
+        np.save(os.path.join(save_dir, f"{dataset_name}_seed{seed}_ypred.npy"), y_pred)
+
     nmi, ari, acc, pur, f_score = evaluate(labels_vector, y_pred)
     print('ACC = {:.4f} NMI = {:.4f} PUR = {:.4f} ARI = {:.4f} f_score = {:.4f}'.format(acc, nmi, pur, ari, f_score))

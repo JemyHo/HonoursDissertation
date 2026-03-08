@@ -24,12 +24,12 @@ parser.add_argument("--k", default=5)
 parser.add_argument("--alpha", default=None, type=float, help="Override alpha if set")
 parser.add_argument("--beta", default=None, type=float, help="Override beta if set")
 parser.add_argument('--gpu', default='0', type=str, help='GPU device idx.')
-parser.add_argument("--seed", type=int, default=0)
-args = parser.parse_args()
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+# IMPORTANT: seed is optional now. If not given, we set dataset defaults later.
+parser.add_argument("--seed", type=int, default=None)
 
 args = parser.parse_args()
+
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -91,23 +91,26 @@ if __name__ == "__main__":
         beta = 0.1
 
     elif args.dataset == 'MFeat':
-        args.seed = 0
-        args.k = 10
-        alpha = 0.01
-        beta = 0.1
+      if args.seed is None:
+          args.seed = 0
+      args.k = 10
+      alpha = 0.01
+      beta = 0.1
 
     elif args.dataset == 'Reuters':
-        args.seed = 0
-        args.k = 10
-        alpha = 0.01
-        beta = 0.1
+      if args.seed is None:
+          args.seed = 0
+      args.k = 10
+      alpha = 0.01
+      beta = 0.1
 
     elif args.dataset == 'AwA2':
-        args.large_datasets = True
-        args.seed = 0
-        args.k = 3
-        alpha = 0.1
-        beta = 0.1
+      args.large_datasets = True
+      if args.seed is None:
+          args.seed = 0
+      args.k = 3
+      alpha = 0.1
+      beta = 0.1
 
     print("==================================\nArgs:{}\n==================================".format(args))
     set_seed(args.seed)
@@ -141,7 +144,7 @@ if __name__ == "__main__":
             total_loss = contrastive_train(network, mv_data, mvc_loss, args.batch_size, epoch, W, alpha, beta, optimizer)
             epoch_list.append(epoch)
             totalloss_list.append(total_loss)
-        valid(network, mv_data, num_samples)
+        valid(network, mv_data, num_samples, dataset_name=args.dataset, seed=args.seed, save_dir="preds")
 
     else:
         for epoch in range(1, args.con_epochs + 1):
@@ -149,4 +152,4 @@ if __name__ == "__main__":
                                                         alpha, beta, optimizer)
             epoch_list.append(epoch)
             totalloss_list.append(total_loss)
-        valid(network, mv_data, num_samples)
+        valid(network, mv_data, num_samples, dataset_name=args.dataset, seed=args.seed, save_dir="preds")

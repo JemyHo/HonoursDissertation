@@ -12,6 +12,9 @@ from sklearn.preprocessing import StandardScaler
 
 REUTERS_FILE_RE = re.compile(r"reut2-\d{3}\.sgm$")
 
+def extract_split(block: str):
+    m = re.search(r'LEWISSPLIT="([^"]+)"', block)
+    return m.group(1).upper() if m else ""
 
 def iter_reuters_docs(sgm_text: str):
     # Split on closing tag (fast and good enough)
@@ -31,21 +34,24 @@ def extract_topics(block: str):
 
 
 def extract_text(block: str):
-    # Prefer BODY; fall back to TEXT
-    m = re.search(r"<BODY>(.*?)</BODY>", block, flags=re.S)
-    if not m:
+    title_m = re.search(r"<TITLE>(.*?)</TITLE>", block, flags=re.S)
+    body_m = re.search(r"<BODY>(.*?)</BODY>", block, flags=re.S)
+
+    title = title_m.group(1) if title_m else ""
+    body = body_m.group(1) if body_m else ""
+
+    txt = f"{title} {body}".strip()
+    if not txt:
         m = re.search(r"<TEXT[^>]*>(.*?)</TEXT>", block, flags=re.S)
-    if not m:
-        return ""
-    txt = m.group(1)
-    # strip tags
+        txt = m.group(1) if m else ""
+
     txt = re.sub(r"<[^>]+>", " ", txt)
     txt = html.unescape(txt)
     txt = re.sub(r"\s+", " ", txt).strip()
     return txt
 
 
-def load_reuters(data_dir: str, single_label_only: bool = True):
+def load_reuters(data_dir: str, splits=("TRAIN",), single_label_only: bool = True):
     files = [f for f in os.listdir(data_dir) if REUTERS_FILE_RE.search(f)]
     if not files:
         raise FileNotFoundError(f"No reut2-XXX.sgm files in {data_dir}")
@@ -59,19 +65,24 @@ def load_reuters(data_dir: str, single_label_only: bool = True):
         with open(path, "r", encoding="latin-1") as fp:
             sgm = fp.read()
         for doc in iter_reuters_docs(sgm):
+            split_tag = extract_split(doc)
+            if splits is not None and split_tag not in splits:
+                continue
+
             topics = extract_topics(doc)
             if not topics:
                 continue
             if single_label_only and len(topics) != 1:
                 continue
+
             text = extract_text(doc)
             if not text:
                 continue
+
             texts.append(text)
             labels.append(topics[0])
 
     return texts, labels
-
 
 def main(data_dir: str = ".", out_path: str = "datasets/Reuters.mat", top_k: int = 10,
          word_dim: int = 256, char_dim: int = 256, max_features: int = 20000):
@@ -97,10 +108,12 @@ def main(data_dir: str = ".", out_path: str = "datasets/Reuters.mat", top_k: int
 
     # View 1: word TF-IDF -> SVD
     word_vec = TfidfVectorizer(
-        stop_words="english",
-        max_features=max_features,
-        min_df=2,
-    )
+      stop_words="english",
+      lowercase=True,
+      max_df=0.9,
+      min_df=2,
+      max_features=50000,
+    )   
     Xw = word_vec.fit_transform(filt_texts)
     svd_w = TruncatedSVD(n_components=min(word_dim, Xw.shape[1]-1), random_state=0)
     Xw = svd_w.fit_transform(Xw).astype(np.float32)
@@ -108,10 +121,12 @@ def main(data_dir: str = ".", out_path: str = "datasets/Reuters.mat", top_k: int
 
     # View 2: char TF-IDF -> SVD
     char_vec = TfidfVectorizer(
-        analyzer="char",
-        ngram_range=(3, 5),
-        max_features=max_features,
-        min_df=2,
+      analyzer="char_wb",
+      ngram_range=(3, 5),
+      lowercase=True,
+      max_df=0.95,
+      min_df=2,
+      max_features=80000,
     )
     Xc = char_vec.fit_transform(filt_texts)
     svd_c = TruncatedSVD(n_components=min(char_dim, Xc.shape[1]-1), random_state=0)
@@ -123,7 +138,8 @@ def main(data_dir: str = ".", out_path: str = "datasets/Reuters.mat", top_k: int
     X_cell[0, 1] = Xc
 
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
-    savemat(out_path, {"X": X_cell, "Y": y})
+    topic_names_arr = np.array(top, dtype=object).reshape(-1, 1)
+    savemat(out_path, {"X": X_cell, "Y": y, "topic_names": topic_names_arr})
     print(f"Saved to {out_path}")
     print("Top topics:")
     for t in top:

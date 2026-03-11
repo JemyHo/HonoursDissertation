@@ -1,0 +1,45 @@
+==================================
+Args:Namespace(dataset='AwA2', save_model=True, batch_size=256, temperature_f=0.5, temperature_l=0.5, learning_rate=0.0001, weight_decay=0.0, mse_epochs=200, con_epochs=100, feature_dim=256, large_datasets=True, k=5, alpha=None, beta=None, gpu='0', seed=4)
+==================================
+Pre-training, epoch 10, Loss:20.3368636
+Pre-training, epoch 20, Loss:16.4428667
+Pre-training, epoch 30, Loss:14.3061101
+Pre-training, epoch 40, Loss:12.7955165
+Pre-training, epoch 50, Loss:11.6966454
+Pre-training, epoch 60, Loss:10.8301859
+Pre-training, epoch 70, Loss:10.0797510
+Pre-training, epoch 80, Loss:9.4671555
+Pre-training, epoch 90, Loss:8.9346619
+Pre-training, epoch 100, Loss:8.4975905
+Pre-training, epoch 110, Loss:8.0876390
+Pre-training, epoch 120, Loss:7.7458092
+Pre-training, epoch 130, Loss:7.4257173
+Pre-training, epoch 140, Loss:7.1552909
+Pre-training, epoch 150, Loss:6.8862167
+Pre-training, epoch 160, Loss:6.6573749
+Pre-training, epoch 170, Loss:6.4437065
+Pre-training, epoch 180, Loss:6.2432236
+Pre-training, epoch 190, Loss:6.0501480
+Pre-training, epoch 200, Loss:5.8797500
+Contrastive_train, epoch 5 loss:18.1910233
+Contrastive_train, epoch 10 loss:15.5336522
+Contrastive_train, epoch 15 loss:15.1802090
+Contrastive_train, epoch 20 loss:14.3614202
+Contrastive_train, epoch 25 loss:13.8045286
+Contrastive_train, epoch 30 loss:13.6168467
+Contrastive_train, epoch 35 loss:13.0910740
+Contrastive_train, epoch 40 loss:12.7396815
+Contrastive_train, epoch 45 loss:12.3169989
+Contrastive_train, epoch 50 loss:12.2863402
+Contrastive_train, epoch 55 loss:11.9604084
+Contrastive_train, epoch 60 loss:12.0439676
+Contrastive_train, epoch 65 loss:11.3514870
+Contrastive_train, epoch 70 loss:11.5853766
+Contrastive_train, epoch 75 loss:10.9559676
+Contrastive_train, epoch 80 loss:11.0558061
+Contrastive_train, epoch 85 loss:10.9737670
+Contrastive_train, epoch 90 loss:10.5363332
+Contrastive_train, epoch 95 loss:10.6888968
+Contrastive_train, epoch 100 loss:10.5042860
+Clustering results:
+ACC = 0.9757 NMI = 0.9950 PUR = 0.9823 ARI = 0.9773 f_score = 0.9779

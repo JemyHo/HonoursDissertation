@@ -2,8 +2,7 @@ import os
 import sys
 import subprocess
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
-DCMVC_DIR = os.path.join(ROOT, "DCMVC")
+DCMVC_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def main():
     cmd = [sys.executable, "train.py"] + sys.argv[1:]

@@ -1,7 +1,11 @@
-# Minimal deps for this repo in Colab/local
 numpy
-scipy
-scikit-learn
-hdf5storage
 torch
+scikit-learn
+scipy
+beautifulsoup4
 matplotlib
+pandas
+torchvision
+pillow
+hdf5storage
+faiss-cpu

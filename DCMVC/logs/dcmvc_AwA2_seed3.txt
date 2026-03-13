@@ -1,5 +1,5 @@
 ==================================
-Args:Namespace(dataset='AwA2', save_model=True, batch_size=256, temperature_f=0.5, temperature_l=0.5, learning_rate=0.0001, weight_decay=0.0, mse_epochs=200, con_epochs=100, feature_dim=256, large_datasets=True, k=5, alpha=None, beta=None, gpu='0', seed=3)
+Args:Namespace(dataset='AwA2', save_model=True, batch_size=256, temperature_f=0.5, temperature_l=0.5, learning_rate=0.0001, weight_decay=0.0, mse_epochs=200, con_epochs=100, feature_dim=256, large_datasets=True, k=3, alpha=None, beta=None, gpu='0', seed=3)
 ==================================
 Pre-training, epoch 10, Loss:20.6994783
 Pre-training, epoch 20, Loss:16.9466102
@@ -21,25 +21,25 @@ Pre-training, epoch 170, Loss:6.6553801
 Pre-training, epoch 180, Loss:6.4460262
 Pre-training, epoch 190, Loss:6.2505153
 Pre-training, epoch 200, Loss:6.0723829
-Contrastive_train, epoch 5 loss:18.5862282
-Contrastive_train, epoch 10 loss:17.1520963
-Contrastive_train, epoch 15 loss:15.6396356
-Contrastive_train, epoch 20 loss:14.5584324
-Contrastive_train, epoch 25 loss:14.2655692
-Contrastive_train, epoch 30 loss:14.0493507
-Contrastive_train, epoch 35 loss:13.2330104
-Contrastive_train, epoch 40 loss:13.0729016
-Contrastive_train, epoch 45 loss:12.7778322
-Contrastive_train, epoch 50 loss:12.3650224
-Contrastive_train, epoch 55 loss:12.5275299
-Contrastive_train, epoch 60 loss:12.2337148
-Contrastive_train, epoch 65 loss:11.6091391
-Contrastive_train, epoch 70 loss:11.3704728
-Contrastive_train, epoch 75 loss:11.5603910
-Contrastive_train, epoch 80 loss:10.9641697
-Contrastive_train, epoch 85 loss:10.9488136
-Contrastive_train, epoch 90 loss:11.1953199
-Contrastive_train, epoch 95 loss:11.0740118
-Contrastive_train, epoch 100 loss:10.8089689
+Contrastive_train, epoch 5 loss:34.1083964
+Contrastive_train, epoch 10 loss:31.9165064
+Contrastive_train, epoch 15 loss:30.7140723
+Contrastive_train, epoch 20 loss:29.8424870
+Contrastive_train, epoch 25 loss:29.5363458
+Contrastive_train, epoch 30 loss:29.1363403
+Contrastive_train, epoch 35 loss:28.5669699
+Contrastive_train, epoch 40 loss:28.5624331
+Contrastive_train, epoch 45 loss:28.1972455
+Contrastive_train, epoch 50 loss:28.0119557
+Contrastive_train, epoch 55 loss:27.7894465
+Contrastive_train, epoch 60 loss:27.6606137
+Contrastive_train, epoch 65 loss:27.4396322
+Contrastive_train, epoch 70 loss:27.1885253
+Contrastive_train, epoch 75 loss:26.9111670
+Contrastive_train, epoch 80 loss:26.8092628
+Contrastive_train, epoch 85 loss:26.6367933
+Contrastive_train, epoch 90 loss:26.5698894
+Contrastive_train, epoch 95 loss:26.4269730
+Contrastive_train, epoch 100 loss:26.3063670
 Clustering results:
-ACC = 0.9770 NMI = 0.9952 PUR = 0.9823 ARI = 0.9783 f_score = 0.9789
+ACC = 0.9766 NMI = 0.9952 PUR = 0.9823 ARI = 0.9782 f_score = 0.9787

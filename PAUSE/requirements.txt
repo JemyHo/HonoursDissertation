@@ -1,0 +1,11 @@
+torch
+scikit-learn
+scipy
+munkres
+pyyaml
+tqdm
+beautifulsoup4
+torchvision
+pillow
+numpy
+pandas

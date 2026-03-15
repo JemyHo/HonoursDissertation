@@ -1,0 +1,43 @@
+[AwA2] Loaded cached features from /content/HonoursDissertation/Dataset/AwA/Animals_with_Attributes2/_cache
+Warmup epoch 1/20 | loss=2.6676 | ACC=0.7804 NMI=0.9182 ARI=0.7596
+Warmup epoch 2/20 | loss=2.4549 | ACC=0.7639 NMI=0.9190 ARI=0.7500
+Warmup epoch 3/20 | loss=2.4177 | ACC=0.8105 NMI=0.9274 ARI=0.7809
+Warmup epoch 4/20 | loss=2.4025 | ACC=0.8396 NMI=0.9359 ARI=0.8126
+Warmup epoch 5/20 | loss=2.3928 | ACC=0.8217 NMI=0.9329 ARI=0.7998
+Warmup epoch 6/20 | loss=2.3843 | ACC=0.8389 NMI=0.9433 ARI=0.8291
+Warmup epoch 7/20 | loss=2.3803 | ACC=0.8711 NMI=0.9529 ARI=0.8575
+Warmup epoch 8/20 | loss=2.3799 | ACC=0.8256 NMI=0.9437 ARI=0.8177
+Warmup epoch 9/20 | loss=2.3788 | ACC=0.8475 NMI=0.9562 ARI=0.8515
+Warmup epoch 10/20 | loss=2.3751 | ACC=0.8133 NMI=0.9530 ARI=0.8190
+Warmup epoch 11/20 | loss=2.3728 | ACC=0.8367 NMI=0.9498 ARI=0.8359
+Warmup epoch 12/20 | loss=2.3707 | ACC=0.8678 NMI=0.9576 ARI=0.8618
+Warmup epoch 13/20 | loss=2.3669 | ACC=0.8346 NMI=0.9526 ARI=0.8400
+Warmup epoch 14/20 | loss=2.3667 | ACC=0.8709 NMI=0.9578 ARI=0.8645
+Warmup epoch 15/20 | loss=2.3664 | ACC=0.8814 NMI=0.9525 ARI=0.8627
+Warmup epoch 16/20 | loss=2.3639 | ACC=0.8419 NMI=0.9482 ARI=0.8352
+Warmup epoch 17/20 | loss=2.3616 | ACC=0.8440 NMI=0.9544 ARI=0.8454
+Warmup epoch 18/20 | loss=2.3598 | ACC=0.9044 NMI=0.9579 ARI=0.8795
+Warmup epoch 19/20 | loss=2.3571 | ACC=0.8359 NMI=0.9581 ARI=0.8341
+Warmup epoch 20/20 | loss=2.3564 | ACC=0.9016 NMI=0.9606 ARI=0.8843
+[AwA2] Loaded cached features from /content/HonoursDissertation/Dataset/AwA/Animals_with_Attributes2/_cache
+Epoch 21/40 | loss=0.2420 | ACC=0.8687 NMI=0.9598 ARI=0.8521
+Epoch 22/40 | loss=0.2420 | ACC=0.8262 NMI=0.9504 ARI=0.8315
+Epoch 23/40 | loss=0.2418 | ACC=0.8583 NMI=0.9569 ARI=0.8564
+Epoch 24/40 | loss=0.2419 | ACC=0.8415 NMI=0.9587 ARI=0.8400
+Epoch 25/40 | loss=0.2416 | ACC=0.8503 NMI=0.9572 ARI=0.8533
+Epoch 26/40 | loss=0.2418 | ACC=0.8358 NMI=0.9603 ARI=0.8389
+Epoch 27/40 | loss=0.2417 | ACC=0.8557 NMI=0.9578 ARI=0.8538
+Epoch 28/40 | loss=0.2416 | ACC=0.8367 NMI=0.9596 ARI=0.8496
+Epoch 29/40 | loss=0.2420 | ACC=0.8561 NMI=0.9539 ARI=0.8373
+Epoch 30/40 | loss=0.2417 | ACC=0.8667 NMI=0.9510 ARI=0.8541
+Epoch 31/40 | loss=0.2417 | ACC=0.8773 NMI=0.9571 ARI=0.8714
+Epoch 32/40 | loss=0.2419 | ACC=0.8756 NMI=0.9560 ARI=0.8630
+Epoch 33/40 | loss=0.2416 | ACC=0.8742 NMI=0.9615 ARI=0.8706
+Epoch 34/40 | loss=0.2415 | ACC=0.8436 NMI=0.9480 ARI=0.8341
+Epoch 35/40 | loss=0.2414 | ACC=0.8737 NMI=0.9563 ARI=0.8653
+Epoch 36/40 | loss=0.2415 | ACC=0.8726 NMI=0.9563 ARI=0.8687
+Epoch 37/40 | loss=0.2414 | ACC=0.8766 NMI=0.9542 ARI=0.8596
+Epoch 38/40 | loss=0.2413 | ACC=0.8510 NMI=0.9508 ARI=0.8414
+Epoch 39/40 | loss=0.2417 | ACC=0.7922 NMI=0.9508 ARI=0.8055
+Epoch 40/40 | loss=0.2416 | ACC=0.8566 NMI=0.9529 ARI=0.8486
+Best epoch=18 ACC=0.9044 NMI=0.9579 ARI=0.8795

@@ -141,6 +141,27 @@ def load_awa2(
     num_workers: int = 2,
 ) -> Tuple[List[np.ndarray], np.ndarray, List[str]]:
     root = Path(root)
+
+    # ---------- cache paths ----------
+    cache_dir = root / "_cache"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    cache_tag = f"{split}_max{max_per_class}_cont{int(use_continuous)}_rs{random_state}"
+    ximg_fp = cache_dir / f"X_img_{cache_tag}.npy"
+    xattr_fp = cache_dir / f"X_attr_{cache_tag}.npy"
+    y_fp = cache_dir / f"y_true_{cache_tag}.npy"
+    names_fp = cache_dir / f"class_names_{cache_tag}.npy"
+
+    # ---------- fast path: load cached arrays ----------
+    if ximg_fp.exists() and xattr_fp.exists() and y_fp.exists() and names_fp.exists():
+        X_img = np.load(ximg_fp)
+        X_attr = np.load(xattr_fp)
+        y_true = np.load(y_fp)
+        class_names = np.load(names_fp, allow_pickle=True).tolist()
+        print(f"[AwA2] Loaded cached features from {cache_dir}")
+        return [X_img, X_attr], y_true, class_names
+
+    # ---------- original build path ----------
     jpeg_dir = root / "JPEGImages"
     classes_fp = root / "classes.txt"
     train_fp = root / "trainclasses.txt"
@@ -220,6 +241,14 @@ def load_awa2(
             feats.append(fb)
 
     X_img = np.vstack(feats)
+
+    # ---------- save cache ----------
+    np.save(ximg_fp, X_img)
+    np.save(xattr_fp, X_attr)
+    np.save(y_fp, y_true)
+    np.save(names_fp, np.array(class_names, dtype=object))
+    print(f"[AwA2] Saved cached features to {cache_dir}")
+
     return [X_img, X_attr], y_true, class_names
 
 

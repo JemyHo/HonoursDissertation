@@ -1,0 +1,29 @@
+{
+  "dataset": "Reuters",
+  "method": "KMeans",
+  "topics": [
+    "earn",
+    "acq",
+    "crude",
+    "trade",
+    "money-fx",
+    "interest",
+    "money-supply",
+    "ship",
+    "sugar",
+    "coffee"
+  ],
+  "mean": {
+    "ACC": 0.44229290457881854,
+    "NMI": 0.2617788209872685,
+    "ARI": 0.03744619769602596
+  },
+  "std": {
+    "ACC": 0.07698524838675655,
+    "NMI": 0.03428686669885855,
+    "ARI": 0.07321576171176813
+  },
+  "n_iter_mean": 26.6,
+  "n_iter_std": 7.893034904268446,
+  "N": 5722
+}

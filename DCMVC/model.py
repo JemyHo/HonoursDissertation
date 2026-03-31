@@ -1,4 +1,5 @@
 from dataloader import *
+import torch.nn.functional as F
 
 def get_knn_graph(data, k):
     num_samples = data.size(0)
@@ -40,6 +41,20 @@ def psedo_labeling(model, dataset, batch_size):
     commonZ = torch.cat(commonZ_list, dim=0)
     psedo_labels = model.clustering(commonZ)
     model.psedo_labels = psedo_labels
+ 
+    # compute per-sample confidence scores based on distance to assigned cluster centre
+    commonZ_norm = F.normalize(commonZ.float(), dim=1)
+    num_clusters = model.num_clusters
+    centres = torch.zeros(num_clusters, commonZ_norm.size(1)).to(commonZ_norm.device)
+    for k in range(num_clusters):
+        mask = (psedo_labels == k)
+        if mask.sum() > 0:
+            centres[k] = commonZ_norm[mask].mean(dim=0)
+    centres = F.normalize(centres, dim=1)
+    assigned_centre = centres[psedo_labels]                    # [N, d]
+    cos_sim = (commonZ_norm * assigned_centre).sum(dim=1)      # [N], range [-1, 1]
+    confidence = (cos_sim + 1.0) / 2.0                        # rescale to [0, 1]
+    model.psedo_confidence = confidence.detach()
 
 def pre_train(model, mv_data, batch_size, epochs, optimizer):
 
@@ -76,6 +91,8 @@ def contrastive_train(model, mv_data, mvc_loss, batch_size, epoch, W, alpha, bet
     for batch_idx, (sub_data_views, _, sample_idx) in enumerate(mv_data_loader):
         batch_psedo_label = model.psedo_labels[sample_idx]
         y_matrix = (batch_psedo_label.view(-1, 1) == batch_psedo_label.view(1, -1)).int()
+        batch_conf = model.psedo_confidence[sample_idx]
+        conf_matrix = torch.outer(batch_conf, batch_conf)
         xrs, zs = model(sub_data_views)
         common_z = model.fusion(zs)
         q_centers = model.compute_centers(common_z, batch_psedo_label)
@@ -85,16 +102,16 @@ def contrastive_train(model, mv_data, mvc_loss, batch_size, epoch, W, alpha, bet
             k_centers = model.compute_centers(zs[i], batch_psedo_label)
             loss_list.append(criterion(sub_data_views[i], xrs[i]))
             loss_list.append(alpha*mvc_loss.compute_cluster_loss(q_centers, k_centers, batch_psedo_label))
-            loss_list.append(beta*mvc_loss.feature_loss(zs[i], common_z, w, y_matrix))
+            loss_list.append(beta*mvc_loss.feature_loss(zs[i], common_z, w, y_matrix, conf_matrix))
         loss = sum(loss_list)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
-
+ 
     if epoch % 10 == 0:
         print('Contrastive_train, epoch {} loss:{:.7f}'.format(epoch, total_loss))
-
+ 
     return total_loss
 
 
@@ -107,6 +124,8 @@ def contrastive_largedatasetstrain(model, mv_data, mvc_loss, batch_size, epoch, 
     for batch_idx, (sub_data_views, _, sample_idx) in enumerate(mv_data_lodaer):
         batch_psedo_label = model.psedo_labels[sample_idx]
         y_matrix = (batch_psedo_label.view(-1, 1) == batch_psedo_label.view(1, -1)).int()
+        batch_conf = model.psedo_confidence[sample_idx]
+        conf_matrix = torch.outer(batch_conf, batch_conf)
         xrs, zs = model(sub_data_views)
         common_z = model.fusion(zs)
         q_centers = model.compute_centers(common_z, batch_psedo_label)
@@ -115,16 +134,16 @@ def contrastive_largedatasetstrain(model, mv_data, mvc_loss, batch_size, epoch, 
             w = get_knn_graph(sub_data_views[i], k)
             k_centers = model.compute_centers(zs[i], batch_psedo_label)
             loss_list.append(criterion(sub_data_views[i], xrs[i]))
-
+ 
             loss_list.append(alpha*mvc_loss.compute_cluster_loss(q_centers, k_centers, batch_psedo_label))
-            loss_list.append(beta*mvc_loss.feature_loss(zs[i], common_z, w, y_matrix))
+            loss_list.append(beta*mvc_loss.feature_loss(zs[i], common_z, w, y_matrix, conf_matrix))
         loss = sum(loss_list)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
-
+ 
     if epoch % 5 == 0:
         print('Contrastive_train, epoch {} loss:{:.7f}'.format(epoch, total_loss))
-
+ 
     return total_loss

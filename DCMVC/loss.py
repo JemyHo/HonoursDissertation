@@ -12,11 +12,15 @@ class Loss(nn.Module):
         self.similarity = nn.CosineSimilarity(dim=2)
 
 
-    def feature_loss(self, zi, z, w, y_pse):
+    def feature_loss(self, zi, z, w, y_pse, conf_matrix=None):
         cross_view_distance = self.similarity(zi.unsqueeze(1), z.unsqueeze(0)) / self.temperature_f
         N = z.size(0)
         w = w + torch.eye(N, dtype=int).to(w.device)
-        positive_loss = (w & y_pse) * cross_view_distance
+        if conf_matrix is not None:
+            conf = conf_matrix.to(cross_view_distance.device)
+            positive_loss = (w & y_pse) * conf * cross_view_distance
+        else:
+            positive_loss = (w & y_pse) * cross_view_distance
         inter_view_distance = self.similarity(zi.unsqueeze(1), zi.unsqueeze(0)) / self.temperature_f
         positive_loss = -torch.sum(positive_loss)
         negated_w = w ^ True

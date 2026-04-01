@@ -1,35 +1,35 @@
 ==================================
 Args:Namespace(dataset='Reuters', save_model=True, batch_size=256, temperature_f=0.5, temperature_l=0.5, learning_rate=0.0001, weight_decay=0.0, mse_epochs=200, con_epochs=100, feature_dim=256, large_datasets=False, k=10, alpha=None, beta=None, gpu='0', seed=2)
 ==================================
-Pre-training, epoch 10, Loss:39.9441762
-Pre-training, epoch 20, Loss:35.5334214
-Pre-training, epoch 30, Loss:31.2634233
-Pre-training, epoch 40, Loss:27.6372600
-Pre-training, epoch 50, Loss:24.9965103
-Pre-training, epoch 60, Loss:22.9244143
-Pre-training, epoch 70, Loss:21.2550880
-Pre-training, epoch 80, Loss:19.7703835
-Pre-training, epoch 90, Loss:18.5298027
-Pre-training, epoch 100, Loss:17.4239407
-Pre-training, epoch 110, Loss:16.3936808
-Pre-training, epoch 120, Loss:15.4769766
-Pre-training, epoch 130, Loss:14.6688662
-Pre-training, epoch 140, Loss:13.9326996
-Pre-training, epoch 150, Loss:13.2405943
-Pre-training, epoch 160, Loss:12.5981878
-Pre-training, epoch 170, Loss:11.9843694
-Pre-training, epoch 180, Loss:11.4037991
-Pre-training, epoch 190, Loss:10.8632025
-Pre-training, epoch 200, Loss:10.3669834
-Contrastive_train, epoch 10 loss:30.0837457
-Contrastive_train, epoch 20 loss:28.1053764
-Contrastive_train, epoch 30 loss:26.4211435
-Contrastive_train, epoch 40 loss:24.9974517
-Contrastive_train, epoch 50 loss:23.7849023
-Contrastive_train, epoch 60 loss:22.9976332
-Contrastive_train, epoch 70 loss:22.2801755
-Contrastive_train, epoch 80 loss:21.6808053
-Contrastive_train, epoch 90 loss:21.3042769
-Contrastive_train, epoch 100 loss:20.6474809
+Pre-training, epoch 10, Loss:39.9585415
+Pre-training, epoch 20, Loss:35.5505468
+Pre-training, epoch 30, Loss:31.3657556
+Pre-training, epoch 40, Loss:27.7710764
+Pre-training, epoch 50, Loss:25.1349212
+Pre-training, epoch 60, Loss:23.0556248
+Pre-training, epoch 70, Loss:21.3859089
+Pre-training, epoch 80, Loss:19.9179336
+Pre-training, epoch 90, Loss:18.7067792
+Pre-training, epoch 100, Loss:17.6118771
+Pre-training, epoch 110, Loss:16.5930090
+Pre-training, epoch 120, Loss:15.6976471
+Pre-training, epoch 130, Loss:14.8976189
+Pre-training, epoch 140, Loss:14.1440051
+Pre-training, epoch 150, Loss:13.4419528
+Pre-training, epoch 160, Loss:12.7970842
+Pre-training, epoch 170, Loss:12.1717535
+Pre-training, epoch 180, Loss:11.5928976
+Pre-training, epoch 190, Loss:11.0435159
+Pre-training, epoch 200, Loss:10.5541745
+Contrastive_train, epoch 10 loss:34.2389512
+Contrastive_train, epoch 20 loss:32.0452294
+Contrastive_train, epoch 30 loss:30.1604049
+Contrastive_train, epoch 40 loss:28.1742651
+Contrastive_train, epoch 50 loss:26.4673830
+Contrastive_train, epoch 60 loss:25.3301657
+Contrastive_train, epoch 70 loss:24.3785517
+Contrastive_train, epoch 80 loss:23.5535392
+Contrastive_train, epoch 90 loss:22.9804047
+Contrastive_train, epoch 100 loss:22.2436419
 Clustering results:
-ACC = 0.4654 NMI = 0.4402 PUR = 0.7323 ARI = 0.2910 f_score = 0.4703
+ACC = 0.4576 NMI = 0.4401 PUR = 0.7507 ARI = 0.2988 f_score = 0.4767

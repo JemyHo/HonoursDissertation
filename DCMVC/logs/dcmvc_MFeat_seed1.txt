@@ -1,0 +1,35 @@
+==================================
+Args:Namespace(dataset='MFeat', save_model=True, batch_size=256, temperature_f=0.5, temperature_l=0.5, learning_rate=0.0001, weight_decay=0.0, mse_epochs=200, con_epochs=100, feature_dim=256, large_datasets=False, k=10, alpha=None, beta=None, gpu='0', seed=1)
+==================================
+Pre-training, epoch 10, Loss:19.9960637
+Pre-training, epoch 20, Loss:12.9093390
+Pre-training, epoch 30, Loss:9.6529543
+Pre-training, epoch 40, Loss:7.6938832
+Pre-training, epoch 50, Loss:6.4775224
+Pre-training, epoch 60, Loss:5.5503591
+Pre-training, epoch 70, Loss:4.8604977
+Pre-training, epoch 80, Loss:4.3112363
+Pre-training, epoch 90, Loss:3.8425706
+Pre-training, epoch 100, Loss:3.4778380
+Pre-training, epoch 110, Loss:3.1631213
+Pre-training, epoch 120, Loss:2.9114651
+Pre-training, epoch 130, Loss:2.7034009
+Pre-training, epoch 140, Loss:2.5272485
+Pre-training, epoch 150, Loss:2.3650000
+Pre-training, epoch 160, Loss:2.2305600
+Pre-training, epoch 170, Loss:2.1088286
+Pre-training, epoch 180, Loss:1.9800427
+Pre-training, epoch 190, Loss:1.8829179
+Pre-training, epoch 200, Loss:1.7992474
+Contrastive_train, epoch 10 loss:19.8641911
+Contrastive_train, epoch 20 loss:16.0067101
+Contrastive_train, epoch 30 loss:14.4383273
+Contrastive_train, epoch 40 loss:13.3943778
+Contrastive_train, epoch 50 loss:12.6030316
+Contrastive_train, epoch 60 loss:12.2803456
+Contrastive_train, epoch 70 loss:11.6227777
+Contrastive_train, epoch 80 loss:11.4490393
+Contrastive_train, epoch 90 loss:11.4797350
+Contrastive_train, epoch 100 loss:10.7188627
+Clustering results:
+ACC = 0.8365 NMI = 0.8801 PUR = 0.8655 ARI = 0.8085 f_score = 0.8308

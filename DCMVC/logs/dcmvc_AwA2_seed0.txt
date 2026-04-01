@@ -21,25 +21,25 @@ Pre-training, epoch 170, Loss:6.4860444
 Pre-training, epoch 180, Loss:6.2894678
 Pre-training, epoch 190, Loss:6.1021822
 Pre-training, epoch 200, Loss:5.9234925
-Contrastive_train, epoch 5 loss:33.6783231
-Contrastive_train, epoch 10 loss:31.8749489
-Contrastive_train, epoch 15 loss:30.6449706
-Contrastive_train, epoch 20 loss:29.8957748
-Contrastive_train, epoch 25 loss:29.4441512
-Contrastive_train, epoch 30 loss:29.0182857
-Contrastive_train, epoch 35 loss:28.8696437
-Contrastive_train, epoch 40 loss:28.2542990
-Contrastive_train, epoch 45 loss:28.1600451
-Contrastive_train, epoch 50 loss:27.9050874
-Contrastive_train, epoch 55 loss:27.5031669
-Contrastive_train, epoch 60 loss:27.3816130
-Contrastive_train, epoch 65 loss:26.9154277
-Contrastive_train, epoch 70 loss:26.7633567
-Contrastive_train, epoch 75 loss:26.7678786
-Contrastive_train, epoch 80 loss:26.5935909
-Contrastive_train, epoch 85 loss:26.3826013
-Contrastive_train, epoch 90 loss:26.2455785
-Contrastive_train, epoch 95 loss:26.1100339
-Contrastive_train, epoch 100 loss:26.0033939
+Contrastive_train, epoch 5 loss:35.1153235
+Contrastive_train, epoch 10 loss:32.7423773
+Contrastive_train, epoch 15 loss:31.6791518
+Contrastive_train, epoch 20 loss:30.5942304
+Contrastive_train, epoch 25 loss:30.1022897
+Contrastive_train, epoch 30 loss:29.6614729
+Contrastive_train, epoch 35 loss:29.3908848
+Contrastive_train, epoch 40 loss:28.7663657
+Contrastive_train, epoch 45 loss:28.7121787
+Contrastive_train, epoch 50 loss:28.3919966
+Contrastive_train, epoch 55 loss:27.9450700
+Contrastive_train, epoch 60 loss:27.7783305
+Contrastive_train, epoch 65 loss:27.4888254
+Contrastive_train, epoch 70 loss:27.2151224
+Contrastive_train, epoch 75 loss:27.0858687
+Contrastive_train, epoch 80 loss:26.9537184
+Contrastive_train, epoch 85 loss:26.7691802
+Contrastive_train, epoch 90 loss:26.5997069
+Contrastive_train, epoch 95 loss:26.5530539
+Contrastive_train, epoch 100 loss:26.3020639
 Clustering results:
-ACC = 0.9762 NMI = 0.9951 PUR = 0.9823 ARI = 0.9780 f_score = 0.9786
+ACC = 0.9740 NMI = 0.9950 PUR = 0.9823 ARI = 0.9775 f_score = 0.9781
